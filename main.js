@@ -1,119 +1,116 @@
-const fs = require("fs");
-const readline = require("readline");
-const chalk = require("chalk");
-const { ethers } = require("ethers");
-const { Keypair } = require("@solana/web3.js");
-const { Ed25519Keypair: SuiKeypair } = require("@mysten/sui.js");
-const { AptosAccount } = require("aptos");
+import fs from "fs";
+import readline from "readline";
+import chalk from "chalk";
+import { Wallet } from "ethers";
+import { Keypair } from "@solana/web3.js";
+import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519.js";
+import { AptosAccount } from "aptos";
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
-function banner() {
+// Banner cantik
+function showBanner() {
   console.log(chalk.cyan.bold(`
-===============================================
-🚀 MULTI-CHAIN WALLET CREATOR 🚀
-By XBOOT
-Support: EVM | Solana | Sui | Aptos
-===============================================
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       🌐 Multi-Chain Wallet Generator
+         ✨ by XBOOT (EVM • Solana • Sui • Aptos)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `));
 }
 
-function generateWallets(chain, amount) {
+// Fungsi generate wallet
+function generateWallets(chain, count) {
   let wallets = [];
-  for (let i = 0; i < amount; i++) {
-    if (chain === "evm") {
-      const wallet = ethers.Wallet.createRandom();
-      wallets.push({
-        index: i + 1,
-        address: wallet.address,
-        privateKey: wallet.privateKey,
-        mnemonic: wallet.mnemonic.phrase
-      });
-    } else if (chain === "solana") {
+
+  for (let i = 0; i < count; i++) {
+    if (chain === "EVM") {
+      const wallet = Wallet.createRandom();
+      wallets.push({ index: i + 1, address: wallet.address, privateKey: wallet.privateKey });
+    }
+
+    if (chain === "Solana") {
       const kp = Keypair.generate();
-      wallets.push({
-        index: i + 1,
-        address: kp.publicKey.toBase58(),
-        secretKey: Buffer.from(kp.secretKey).toString("hex")
-      });
-    } else if (chain === "sui") {
-      const kp = SuiKeypair.generate();
-      wallets.push({
-        index: i + 1,
-        address: kp.getPublicKey().toSuiAddress(),
-        secretKey: Buffer.from(kp.export().privateKey).toString("hex")
-      });
-    } else if (chain === "aptos") {
-      const acc = new AptosAccount();
-      wallets.push({
-        index: i + 1,
-        address: acc.address().toString(),
-        privateKey: Buffer.from(acc.signingKey.secretKey).toString("hex")
-      });
+      wallets.push({ index: i + 1, address: kp.publicKey.toBase58(), privateKey: Buffer.from(kp.secretKey).toString("hex") });
+    }
+
+    if (chain === "Sui") {
+      const kp = Ed25519Keypair.generate();
+      wallets.push({ index: i + 1, address: kp.getPublicKey().toSuiAddress(), privateKey: Buffer.from(kp.getSecretKey()).toString("hex") });
+    }
+
+    if (chain === "Aptos") {
+      const account = new AptosAccount();
+      wallets.push({ index: i + 1, address: account.address().hex(), privateKey: Buffer.from(account.signingKey.secretKey).toString("hex") });
     }
   }
+
   return wallets;
 }
 
-function saveCSV(wallets, filename) {
-  const keys = Object.keys(wallets[0]);
-  const header = keys.join(",") + "\n";
-  const rows = wallets.map(w => keys.map(k => w[k]).join(",")).join("\n");
-  fs.writeFileSync(`${filename}.csv`, header + rows);
-  console.log(chalk.green(`✅ File berhasil disimpan: ${filename}.csv`));
+// Simpan file CSV atau JSON
+function saveFile(fileName, format, wallets) {
+  try {
+    if (format === "csv") {
+      const header = "index,address,privateKey\n";
+      const rows = wallets.map(w => `${w.index},${w.address},${w.privateKey}`).join("\n");
+      fs.writeFileSync(`${fileName}.csv`, header + rows);
+      console.log(chalk.green(`✅ Wallet berhasil disimpan ke ${fileName}.csv`));
+    } else {
+      fs.writeFileSync(`${fileName}.json`, JSON.stringify(wallets, null, 2));
+      console.log(chalk.green(`✅ Wallet berhasil disimpan ke ${fileName}.json`));
+    }
+  } catch (err) {
+    console.log(chalk.red("❌ Gagal menyimpan file:"), err.message);
+  }
 }
 
-function saveJSON(wallets, filename) {
-  fs.writeFileSync(`${filename}.json`, JSON.stringify(wallets, null, 2));
-  console.log(chalk.green(`✅ File berhasil disimpan: ${filename}.json`));
-}
+// CLI interaktif
+async function start() {
+  showBanner();
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
-// ================== CLI ==================
-banner();
-console.log(chalk.yellow("Pilih chain:"));
-console.log("1. EVM (Ethereum/BNB/etc.)");
-console.log("2. Solana");
-console.log("3. Sui");
-console.log("4. Aptos\n");
+  const ask = (q) => new Promise(resolve => rl.question(q, resolve));
 
-rl.question("👉 Masukkan nomor chain (1-4): ", (chainInput) => {
-  const chainMap = { "1": "evm", "2": "solana", "3": "sui", "4": "aptos" };
-  const chain = chainMap[chainInput];
+  console.log(chalk.yellow("Pilih chain:"));
+  console.log("1️⃣  EVM");
+  console.log("2️⃣  Solana");
+  console.log("3️⃣  Sui");
+  console.log("4️⃣  Aptos\n");
+
+  const chainChoice = await ask("👉 Pilih chain (1-4): ");
+  const chains = { "1": "EVM", "2": "Solana", "3": "Sui", "4": "Aptos" };
+  const chain = chains[chainChoice];
 
   if (!chain) {
-    console.log(chalk.red("❌ Chain tidak valid."));
+    console.log(chalk.red("❌ Pilihan tidak valid."));
     rl.close();
     return;
   }
 
-  rl.question("👉 Masukkan jumlah wallet (max 1000): ", (amountInput) => {
-    const amount = parseInt(amountInput);
-    if (isNaN(amount) || amount <= 0 || amount > 1000) {
-      console.log(chalk.red("❌ Jumlah tidak valid. Gunakan angka 1-1000."));
-      rl.close();
-      return;
-    }
+  const countInput = await ask("👉 Jumlah wallet yang ingin dibuat (maks 1000): ");
+  const count = parseInt(countInput);
 
-    rl.question("👉 Nama file output (tanpa ekstensi): ", (filename) => {
-      rl.question("👉 Pilih format output (csv/json): ", (format) => {
+  if (isNaN(count) || count <= 0 || count > 1000) {
+    console.log(chalk.red("❌ Jumlah wallet tidak valid."));
+    rl.close();
+    return;
+  }
 
-        console.log(chalk.yellow.bold("\n⚠️ Jangan bagikan file ini! Semua private key bersifat rahasia.\n"));
+  const fileName = await ask("👉 Nama file output (tanpa ekstensi): ");
+  const formatChoice = await ask("👉 Pilih format (csv/json): ");
+  const format = formatChoice.toLowerCase();
 
-        const wallets = generateWallets(chain, amount);
+  if (format !== "csv" && format !== "json") {
+    console.log(chalk.red("❌ Format tidak valid."));
+    rl.close();
+    return;
+  }
 
-        if (format.toLowerCase() === "csv") {
-          saveCSV(wallets, filename);
-        } else if (format.toLowerCase() === "json") {
-          saveJSON(wallets, filename);
-        } else {
-          console.log(chalk.red("❌ Format tidak dikenal."));
-        }
+  console.log(chalk.cyan(`\n🔄 Membuat ${count} wallet untuk ${chain}...`));
+  const wallets = generateWallets(chain, count);
+  saveFile(fileName, format, wallets);
 
-        rl.close();
-      });
-    });
-  });
-});
+  console.log(chalk.red.bold("\n⚠️ Jangan bagikan file ini! Private key bersifat rahasia.\n"));
+
+  rl.close();
+}
+
+start();
