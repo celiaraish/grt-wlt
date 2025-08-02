@@ -1,0 +1,18 @@
+{
+  "name": "grt-wlt",
+  "version": "1.0.0",
+  "description": "Multi-chain wallet generator untuk EVM, Solana, Sui, dan Aptos.",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "dependencies": {
+    "ethers": "^6.15.0",
+    "@solana/web3.js": "^1.95.1",
+    "@mysten/sui.js": "^0.52.0",
+    "aptos": "^1.21.0",
+    "chalk": "^4.1.2"
+  },
+  "author": "XBOOT",
+  "license": "MIT"
+}
