@@ -1,4 +1,4 @@
-# 🌟 GRT-WLT: Multi-Chain Wallet Generator
+# 🌟 GRT-WLT: Multi-Chain Wallet Generator adalah script Node.js untuk membuat wallet di berbagai jaringan blockchain hanya dengan sekali jalan. Mendukung **EVM (Ethereum, BSC, Arbitrum, dll)**, **Solana**, **Sui**, dan **Aptos**. ✅
 
 **By XBOOT**
 
@@ -19,86 +19,76 @@ Output bisa berupa **CSV** atau **JSON** sesuai kebutuhan Anda.
 ✅ **Validasi input**: Mencegah pembuatan wallet berlebihan (>1000)  
 ✅ **Pilihan format output**: CSV / JSON  
 ✅ **Pesan keamanan**: Peringatan agar private key tidak tersebar
+# 🚀 Multi-Chain Wallet Generator
 
 ---
 
 ## 📦 Instalasi
 
-1️⃣ **Clone repo**
+1️⃣ **Clone repositori**
 ```bash
 git clone https://github.com/celiaraish/grt-wlt.git
 cd grt-wlt
 ```
 
-2️⃣ **Install dependencies**
+2️⃣ **Install dependency**
 ```bash
 npm install
 ```
 
----
-
-## ▶️ Cara Menjalankan
-
-```bash
-node main.js
-```
-
-Lalu ikuti instruksi di CLI:
-
-1. Pilih **chain**:
-   - 1 = EVM
-   - 2 = Solana
-   - 3 = Sui
-   - 4 = Aptos
-
-2. Masukkan **jumlah wallet** (maks 1000)  
-3. Tentukan **nama file output** (tanpa ekstensi)  
-4. Pilih format output **CSV** atau **JSON**
-
----
-
-## 📂 Contoh Output
-
-### 📄 **CSV**
-```
-index,address,privateKey
-1,0x1234abcd...,0xabcd1234...
-2,0x5678efgh...,0xefgh5678...
-```
-
-### 🗂 **JSON**
-```json
-[
-  {
-    "index": 1,
-    "address": "0x1234abcd...",
-    "privateKey": "0xabcd1234..."
-  }
-]
-```
-
----
-
-## ⚠️ Keamanan
-- 🚨 **JANGAN BAGIKAN PRIVATE KEY atau MNEMONIC Anda!**
-- File CSV/JSON hanya untuk keperluan **development** & **testing**
-- Jangan upload file hasil ke publik atau GitHub
-
----
-
-## 📜 Script Utama
-📄 **main.js** – berisi semua logika CLI, generate wallet, dan simpan file.  
-
-👉 Jalankan dengan:
+3️⃣ **Jalankan script**
 ```bash
 npm start
 ```
 
-Atau langsung:
-```bash
-node main.js
-```
+---
+
+## ⚙️ Cara Menggunakan
+
+Setelah menjalankan `npm start`, kamu akan diminta:
+
+1️⃣ **Pilih jaringan**  
+   ➡️ Pilihan angka (1: EVM, 2: Solana, 3: Sui, 4: Aptos)
+
+2️⃣ **Masukkan jumlah wallet yang ingin dibuat** (max 100)
+
+3️⃣ **Pilih format output** (CSV/JSON)
+
+4️⃣ **Masukkan nama file output**  
+   ➡️ Contoh: `walletku` akan menghasilkan `walletku.csv` atau `walletku.json`
 
 ---
 
-✨ Dibuat dengan ❤️ oleh **XBOOT**
+## 📄 Output
+
+File hasil akan berisi data seperti:
+
+- **Nomor urut**
+- **Address**
+- **Private Key** *(hanya untuk EVM & Solana)*
+- **Mnemonic Phrase** *(semua chain)*
+
+⚠️ **PERINGATAN:** Private key dan mnemonic phrase sangat sensitif. Jangan pernah membagikan file hasil ke orang lain!
+
+---
+
+## 🛠️ Dependency Utama
+
+- **ethers** → Generate wallet EVM
+- **@solana/web3.js** → Generate wallet Solana
+- **@mysten/sui.js** → Generate wallet Sui
+- **aptos** → Generate wallet Aptos
+- **bip39** → Generate mnemonic phrase
+- **chalk** → Tampilan CLI lebih menarik
+
+---
+
+## 👨‍💻 Creator
+
+Script ini dibuat oleh **XBOOT** ⚡ untuk memudahkan pembuatan wallet multi-chain.
+
+---
+
+## 📜 Lisensi
+
+MIT License.
