@@ -43,6 +43,14 @@ npm start
 
 ---
 
+
+NOTE:
+USE NODE VERSION UNDER 20
+IF ERROR ON APTOS USE APTOS VERSION aptos@1.14.0
+
+
+
+
 ## ⚙️ Cara Menggunakan
 
 Setelah menjalankan `npm start`, kamu akan diminta:
